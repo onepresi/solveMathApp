@@ -1,35 +1,48 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { Tabs } from 'expo-router';
-import React from 'react';
+import type { ComponentProps } from 'react';
 
 import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useTheme } from '@/hooks/use-theme';
+
+type IconName = ComponentProps<typeof Ionicons>['name'];
+
+const TABS: { name: string; title: string; icon: IconName; iconActive: IconName }[] = [
+  { name: 'index', title: 'Dashboard', icon: 'grid-outline', iconActive: 'grid' },
+  { name: 'saved', title: 'Saved', icon: 'bookmark-outline', iconActive: 'bookmark' },
+  { name: 'learn', title: 'Learn', icon: 'book-outline', iconActive: 'book' },
+  { name: 'quiz', title: 'Quiz', icon: 'help-circle-outline', iconActive: 'help-circle' },
+  { name: 'settings', title: 'Settings', icon: 'settings-outline', iconActive: 'settings' },
+];
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const { colors } = useTheme();
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
         tabBarButton: HapticTab,
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.tabInactive,
+        tabBarStyle: {
+          backgroundColor: colors.surface,
+          borderTopColor: colors.border,
+        },
+        tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
       }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-        }}
-      />
+      {TABS.map((tab) => (
+        <Tabs.Screen
+          key={tab.name}
+          name={tab.name}
+          options={{
+            title: tab.title,
+            tabBarIcon: ({ color, focused, size }) => (
+              <Ionicons name={focused ? tab.iconActive : tab.icon} size={size ?? 24} color={color} />
+            ),
+          }}
+        />
+      ))}
     </Tabs>
   );
 }
